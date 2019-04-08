@@ -14,9 +14,31 @@ var UserSchema = new Schema({
   },
 
   address: String,
+  
   history: [{
     date: Date,
     paid: {type: Number, default: 0}
   }]
+});
 
-})
+/*Hashing passwords to db*/
+UserSchema.pre('save', function(next){  //pre is a built in method
+  var user = this;
+  if(!user.isModified('password'))
+    return next();
+  bcrypt.genSalt(10, function(err, salt){
+    if(err)
+      return next(err);
+    bcrypt.hash(user.password, salt, function(err, hash){
+      if(err)
+        return next(err);
+      user.password = hash;
+      next();
+    });
+  });
+});
+
+/*Comparing Passwords*/
+UserSchema.methods.comparePassword = function(password){  //add methods to create a custom method
+  return bcrypt.compareSync(pasword, this.password);
+}
