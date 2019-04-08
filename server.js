@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
-const ejs-mate = require('ejs-mate');
+const engine = require('ejs-mate');
 
 
 const User = require('./models/user');
@@ -20,10 +20,11 @@ mongoose.connect('mongodb://root:abc123@ds233806.mlab.com:33806/shopping-cart', 
 
 
 //middleware
+app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.engine('ejs', ejs-mate);
+app.engine('ejs', engine);
 app.set('view engine', 'ejs')
 
 app.post('/createUser', function(req, res, next) {
@@ -40,6 +41,15 @@ app.post('/createUser', function(req, res, next) {
   });
 });
 
+//Home Page
+app.get('/', (req, res) => {
+  res.render('main/home');
+});
+
+//About Page
+app.get('/about', (req, res) => {
+  res.render('main/about');
+});
 
 app.listen('8080', (err) => {
   if (err) throw err;
