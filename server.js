@@ -27,18 +27,32 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.engine('ejs', engine);
 app.set('view engine', 'ejs')
 
-app.post('/createUser', function(req, res, next) {
+//New User(Signup)
+app.post('/signup', function(req, res, next) {
   var user = new User();
 
   user.profile.name = req.body.name;
   user.password = req.body.password;
   user.email = req.body.email;
 
-  user.save(function(err){
-    if (err) return next(err);
+  User.findOne({ email: req.body.email }, (err, existingUser) => {
 
-    res.json('Successfully Created');
-  });
+    if(existingUser){
+       console.log(`${req.body.email} already exists.`);
+       return res.redirect('/signup');
+  } else {
+      user.save((err, user) => {
+        if (err) return next(err)
+
+        res.json('User has been created.');
+        });
+      }
+    });
+});
+
+//Redirecting to page, if user already exists
+app.get('/signup', (req, res, next) => {
+  res.render('../views/accounts/signup');
 });
 
 //Home Page
@@ -46,10 +60,12 @@ app.get('/', (req, res) => {
   res.render('main/home');
 });
 
+
 //About Page
 app.get('/about', (req, res) => {
   res.render('main/about');
 });
+
 
 app.listen('8080', (err) => {
   if (err) throw err;
