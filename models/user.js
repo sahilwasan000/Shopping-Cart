@@ -37,6 +37,7 @@ UserSchema.pre('save', function(next){  //pre is a built in method
   });
 });
 
+
 // UserSchema.pre('save', function (next) {
 //   var user = this;
 //
