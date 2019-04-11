@@ -38,8 +38,14 @@ app.engine('ejs', engine);
 app.set('view engine', 'ejs')
 
 
+//Home Page
+app.get('/', (req, res) => {
+  res.render('main/home');
+});
+
+
 //Redirecting to page, if user already exists
-app.get('/signup', (req, res) => {
+app.get('/signup', (req, res, next) => {
   res.render('../views/accounts/signup', {
     errors: req.flash('errors')
   });
@@ -69,13 +75,6 @@ app.post('/signup', function(req, res, next) {
         });
       }
     });
-});
-
-
-
-//Home Page
-app.get('/', (req, res) => {
-  res.render('main/home');
 });
 
 

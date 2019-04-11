@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 /*The User Schema Attr*/
 var UserSchema = new Schema({
   email: {type: String, unique: true, lowercase: true},
-  password:  {type: String, minLength: 6},
+  password:  String,
 
   profile: {
     name: {type: String, default: ''},
@@ -13,7 +13,6 @@ var UserSchema = new Schema({
   },
 
   address: String,
-
   history: [{
     date: Date,
     paid: {type: Number, default: 0}
@@ -23,14 +22,11 @@ var UserSchema = new Schema({
 /*Hashing passwords to db*/
 UserSchema.pre('save', function(next){  //pre is a built in method
   var user = this;
-  if(!user.isModified('password'))
-    return next();
+  if(!user.isModified('password')) return next();
   bcrypt.genSalt(10, function(err, salt){
-    if(err)
-      return next(err);
+    if(err) return next(err);
     bcrypt.hash(user.password, salt, function(err, hash){
-      if(err)
-        return next(err);
+      if(err) return next(err);
       user.password = hash;
       next();
     });
