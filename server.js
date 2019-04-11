@@ -4,7 +4,9 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const engine = require('ejs-mate');
-
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const flash = require('express-flash');
 
 const User = require('./models/user');
 
@@ -24,8 +26,25 @@ app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(session({
+  resave: true,
+  saveUninitialized: true,
+  secret: "Lord@#$%"
+}));
+app.use(flash());
+
 app.engine('ejs', engine);
 app.set('view engine', 'ejs')
+
+
+//Redirecting to page, if user already exists
+app.get('/signup', (req, res) => {
+  res.render('../views/accounts/signup', {
+    errors: req.flash('errors')
+  });
+});
+
 
 //New User(Signup)
 app.post('/signup', function(req, res, next) {
@@ -35,25 +54,24 @@ app.post('/signup', function(req, res, next) {
   user.password = req.body.password;
   user.email = req.body.email;
 
-  User.findOne({ email: req.body.email }, (err, existingUser) => {
+  User.findOne({ email: req.body.email }, function (err, existingUser) {
 
     if(existingUser){
-       console.log(`${req.body.email} already exists.`);
-       return res.redirect('/signup');
+//       return res.redirect('/signup');
+      req.flash('errors', 'Account with that already exists');
+      return res.redirect('/signup');
   } else {
-      user.save((err, user) => {
+      user.save(function (err, user, next) {
         if (err) return next(err)
 
-        res.json('User has been created.');
+//        res.json('User has been created.');
+        return res.redirect('/');
         });
       }
     });
 });
 
-//Redirecting to page, if user already exists
-app.get('/signup', (req, res, next) => {
-  res.render('../views/accounts/signup');
-});
+
 
 //Home Page
 app.get('/', (req, res) => {
