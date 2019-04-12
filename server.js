@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
 
 
 //Redirecting to page, if user already exists
-app.get('/signup', (req, res, next) => {
+app.get('/signup', function (req, res, next) {
   res.render('../views/accounts/signup', {
     errors: req.flash('errors')
   });
@@ -54,7 +54,7 @@ app.get('/signup', (req, res, next) => {
 
 //New User(Signup)
 app.post('/signup', function(req, res, next) {
-  var user = new User();
+  const user = new User();
 
   user.profile.name = req.body.name;
   user.password = req.body.password;
@@ -65,13 +65,11 @@ app.post('/signup', function(req, res, next) {
     if(existingUser){
 //       return res.redirect('/signup');
       req.flash('errors', 'Account with that already exists');
-      return res.redirect('/signup');
+      return res.redirect('signup');
   } else {
-      user.save(function (err, user, next) {
-        if (err) return next(err)
-
-//        res.json('User has been created.');
-        return res.redirect('/');
+      user.save(function (err, user) {
+        if (err) return next(err);
+          res.send('/');
         });
       }
     });
