@@ -60,16 +60,17 @@ app.post('/signup', function(req, res, next) {
   user.password = req.body.password;
   user.email = req.body.email;
 
-  User.findOne({ email: req.body.email }, function (err, existingUser) {
+  User.findOne({ email : req.body.email } , function (err, existingUser) {
 
     if(existingUser){
 //       return res.redirect('/signup');
       req.flash('errors', 'Account with that already exists');
       return res.redirect('signup');
-  } else {
+    }
+    else {
       user.save(function (err, user) {
         if (err) return next(err);
-          res.send('/');
+          res.redirect('/');
         });
       }
     });
